@@ -1,0 +1,57 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.navbar-custom {
+    background-color: red;
+}
+
+.navbar-custom .nav-link:hover {
+    color: yellow;
+}
+
+.navbar-custom .navbar-brand img {
+    max-height: 40px; 
+    margin-right: 10px; 
+}
+
+.table-header {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.cargo {
+    background-color: rgba(255, 0, 0, 0.2); /* Rojo suave */
+}
+
+.abono {
+    background-color: rgba(0, 128, 0, 0.2); /* Verde suave */
+}
+
+.table-header {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+
+

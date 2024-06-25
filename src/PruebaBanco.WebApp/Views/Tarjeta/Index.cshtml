@@ -1,0 +1,246 @@
+﻿@model PruebaBanco.WebApp.ViewModels.DataViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-xl pt-4">
+    <h1 class="fw-bold display-6">Estado de Cuenta</h1>
+</div>
+
+<div class="container-xl pt-2">
+    <input type="hidden" id="numeroTarjeta" value="@Model.Tarjeta.numeroTarjeta" />
+    <input type="hidden" id="saldoDisponible" value="@Model.Tarjeta.saldoDisponible" />
+    <input type="hidden" id="saldoActual" value="@Model.Tarjeta.saldoTotal" />
+    <div class="card shadow-lg p-2 mb-4 bg-white rounded">
+        <div class="card-body p-2">
+            <div class="row mb-1">
+                <div class="col-md-6">
+                    <p class="fw-bold mb-1">Nombre titular en tarjeta</p>
+                    <p class="mb-1">@Model.Tarjeta.nombreTitular</p>
+                    <p class="fw-bold mt-3 mb-1">Número de Tarjeta</p>
+                    <p class="mb-1">@Model.Tarjeta.numeroTarjeta</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="row mb-1">
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Cuota mínima</p>
+                            <p class="mb-1">@Model.Tarjeta.cuotaMinima.ToString("C")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Saldo Actual</p>
+                            <p class="mb-1">@Model.Tarjeta.saldoTotal.ToString("C")</p>
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Interés bonificable</p>
+                            <p class="mb-1">@Model.Tarjeta.interesBonificable.ToString("C")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Saldo Disponible</p>
+                            <p class="mb-1">@Model.Tarjeta.saldoDisponible.ToString("C")</p>
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Monto total con interés</p>
+                            <p class="mb-1">@Model.Tarjeta.totalContadoConInteres.ToString("C")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="fw-bold mb-1">Límite Crédito</p>
+                            <p class="mb-1">@Model.Tarjeta.montoOtorgado.ToString("C")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#compraModal" data-idtarjeta="@Model.Tarjeta.id" data-tipotrasaccion="0">
+                    <i class="bi bi-credit-card"></i> Realizar Compra
+                </button>
+                <button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#compraModal" data-idtarjeta="@Model.Tarjeta.id" data-tipotrasaccion="1">
+                    <i class="bi bi-credit-card"></i> Realizar Pago
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+    <div class="container">
+        <div class="card-footer">
+            <h3>Transacciones de Compras</h3>
+            <table id="transaccionesTable" class="table table-striped">
+                <thead class="table-header mt-2">
+                    <tr>
+                        <th>Fecha de Transacción</th>
+                        <th>Descripción</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in Model.Transacciones.Where(t => t.TipoTransaccion != "1"))
+                    {
+                        <tr>
+                            <td>@transaction.FechaTransaccion.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@transaction.Descripcion</td>
+                            <td>@transaction.Monto.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <h6 class="mb-0 me-3 fw-bold">Compras Mes Actual: @Model.Tarjeta.comprasTotal.ToString("C")</h6>
+                <h6 class="mb-0 fw-bold">Compras Mes Anterior: @Model.Tarjeta.comprasMesAnterior.ToString("C")</h6>
+            </div>
+            <div class="text-center">
+            <a class="btn btn-success" href="@Url.Action("ExportarComprasAExcel", "Tarjeta", new { idTarjeta = Model.Tarjeta.id })">Generar Excel</a>
+            </div>
+        </div>
+    </div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="compraModal" tabindex="-1" aria-labelledby="compraModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compraModalLabel">Transacción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="compraForm">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="datetime-local" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3" id="descripcionDiv">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" class="form-control" id="monto" name="monto" required>
+                    </div>
+                    <input type="hidden" id="idTarjeta" name="idTarjeta">
+                    <input type="hidden" id="TipoTransaccion" name="TipoTransaccion">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="submitCompraForm">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transaccionesTable').DataTable({
+                pageLength: 5,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json'
+                }
+            });
+        });
+
+        var compraModal = document.getElementById('compraModal');
+        compraModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var idTarjeta = button.getAttribute('data-idtarjeta');
+            var tipoTransaccion = button.getAttribute('data-tipotrasaccion');
+            var modalBodyInputIdTarjeta = compraModal.querySelector('#idTarjeta');
+            var modalBodyInputTipoTransaccion = compraModal.querySelector('#TipoTransaccion');
+            var descripcionDiv = document.getElementById('descripcionDiv');
+            var descripcionInput = document.getElementById('descripcion');
+
+            modalBodyInputIdTarjeta.value = idTarjeta;
+            modalBodyInputTipoTransaccion.value = tipoTransaccion;
+
+            if (tipoTransaccion == "1") {
+                descripcionDiv.style.display = "none";
+                descripcionInput.value = "PagoTC";
+            } else {
+                descripcionDiv.style.display = "block";
+                descripcionInput.value = "";
+            }
+        });
+
+        document.getElementById('submitCompraForm').addEventListener('click', function () {
+            var monto = parseFloat(document.getElementById('monto').value);
+            var saldoDisponible = parseFloat(document.getElementById('saldoDisponible').value);
+            var saldoActual = parseFloat(document.getElementById('saldoActual').value);
+            var tipoTransaccion = document.getElementById('TipoTransaccion').value;
+
+            if (tipoTransaccion == "0" && monto > saldoDisponible) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No tiene suficiente saldo disponible para realizar esta transacción.'
+                });
+                return;
+            }
+
+            if (tipoTransaccion == "1" && monto > saldoActual) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No puede pagar más de lo que debe.'
+                });
+                return;
+            }
+
+            var formData = {
+                FechaTransaccion: document.getElementById('fecha').value,
+                Descripcion: document.getElementById('descripcion').value,
+                Monto: monto,
+                IdTarjeta: document.getElementById('idTarjeta').value,
+                TipoTransaccion: tipoTransaccion
+            };
+
+            console.log(formData);
+
+            fetch('/Tarjeta/Transacciones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'Transacción realizada con éxito'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al realizar la transacción: ' + data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al realizar la transacción: ' + error.message
+                    });
+                });
+        });
+    </script>
+}
+

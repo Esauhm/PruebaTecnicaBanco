@@ -1,0 +1,151 @@
+{
+	"info": {
+		"_postman_id": "0110b831-e649-4805-9f6e-e4851038802b",
+		"name": "Coleccion-BancoAtlantida",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36553996"
+	},
+	"item": [
+		{
+			"name": "ConsultaAllTarjetas",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "EstadoDeCuentaBynumeroTarjeta",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7258/api/Tarjeta/TarjetasByNumero?numeroTarjeta=4521 1102 2987 9001",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7258",
+					"path": [
+						"api",
+						"Tarjeta",
+						"TarjetasByNumero"
+					],
+					"query": [
+						{
+							"key": "numeroTarjeta",
+							"value": "4521 1102 2987 9001",
+							"description": "Modificar el numero de tarjeta para traer su Estado de Cuenta"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUsuarioByIdTarjeta",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7258/api/Tarjeta/GetDataById?idTarjeta=1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7258",
+					"path": [
+						"api",
+						"Tarjeta",
+						"GetDataById"
+					],
+					"query": [
+						{
+							"key": "idTarjeta",
+							"value": "1",
+							"description": "Cambiar el IdTarjeta para usuario"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RealizarTransaccion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"idTarjeta\": 1,\r\n  \"descripcion\": \"Toalla\",\r\n  \"fechaTransaccion\": \"2024-06-25T21:58:45.848Z\",\r\n  \"monto\": 5,\r\n  \"tipoTransaccion\": \"0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7258/api/Transacciones/RealizarTransaccion",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7258",
+					"path": [
+						"api",
+						"Transacciones",
+						"RealizarTransaccion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTransacciones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7258/api/Transacciones/GetTransacciones?IdTarjeta=1&Mes=06&Anio=2024",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7258",
+					"path": [
+						"api",
+						"Transacciones",
+						"GetTransacciones"
+					],
+					"query": [
+						{
+							"key": "IdTarjeta",
+							"value": "1",
+							"description": "Cambiar el Id de Tarjeta para traer sus transacciones"
+						},
+						{
+							"key": "Mes",
+							"value": "06",
+							"description": "Mes en que queremos ver las transacciones (Mes Actual)"
+						},
+						{
+							"key": "Anio",
+							"value": "2024",
+							"description": "Año en que queremos ver las transacciones (Año Actual)"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

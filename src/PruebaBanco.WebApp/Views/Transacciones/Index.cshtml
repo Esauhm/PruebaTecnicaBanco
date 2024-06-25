@@ -1,0 +1,63 @@
+﻿@model PruebaBanco.WebApp.ViewModels.TransaccionesDataViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-xl">
+    <h1 class="fw-bold display-6">Transacciones</h1>
+</div>
+
+<div class="container-xl">
+    <div class="card shadow-lg p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+            <h5><strong>Propietario:</strong> @Model.TarjetasCredito.nombreTitular</h5>
+            <h5><strong>Número de Tarjeta:</strong> @Model.TarjetasCredito.numeroTarjeta</h5>
+
+            <table id="transaccionesTable" class="table table-striped pt-2">
+                <thead class="bg-light text-dark">
+                    <tr>
+                        <th>Fecha de Transacción</th>
+                        <th>Descripción</th>
+                        <th>Monto</th>
+                        <th>Cargo</th>
+                        <th>Abono</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in Model.Transacciones.OrderByDescending(t => t.FechaTransaccion))
+                    {
+                        <tr>
+                            <td>@transaction.FechaTransaccion.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@transaction.Descripcion</td>
+                            <td>@transaction.Monto.ToString("C")</td>
+                            <td class="@(transaction.TipoTransaccion == "0" ? "cargo" : "")"  style=" background-color: rgba(255, 0, 0, 0.2)";>
+                                @(transaction.TipoTransaccion == "0" ? transaction.Monto.ToString("C") : "")
+                            </td>
+                            <td class="@(transaction.TipoTransaccion == "1" ? "abono" : "")" style=" background-color: rgba(0, 128, 0, 0.2);">
+                                @(transaction.TipoTransaccion == "1" ? transaction.Monto.ToString("C") : "")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"></script>
+    <script>
+        $(document).ready(function () {
+            $('#transaccionesTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json'
+                }
+            });
+        });
+    </script>
+}
+
+

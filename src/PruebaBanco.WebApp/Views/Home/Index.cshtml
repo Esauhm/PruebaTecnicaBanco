@@ -1,0 +1,198 @@
+﻿@model PruebaBanco.WebApp.ViewModels.HomeViewModel;
+
+@{
+    ViewData["Title"] = "Banco";
+}
+
+<div class="container pt-4">
+    <h2 class="fw-bold display-6">Tarjetas de Crédito</h2>
+</div>
+
+<div class="container pt-2">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tarjetasTable" class="table fuenteTabla">
+                    <thead>
+                        <tr>
+                            <th>Número Tarjeta</th>
+                            <th>Titular</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tarjeta in Model.TarjetasCredito)
+                        {
+                            var tarjetaDetalle = Model.TarjetasDetalles.FirstOrDefault(td => td.numeroTarjeta == tarjeta.numeroTarjeta);
+                            <tr>
+                                <td>@tarjeta.numeroTarjeta</td>
+                                <td>@tarjeta.nombreTitular</td>
+                                <td>
+                                    <a class="btn btn-success me-1" asp-area="" asp-controller="Tarjeta" asp-action="Index" asp-route-numeroTarjeta="@tarjeta.numeroTarjeta">
+                                        <i class="bi bi-file-earmark-text-fill"></i> Estado De Cuenta
+                                    </a>
+                                    <button type="button" class="btn btn-primary me-1" data-bs-toggle="modal" data-bs-target="#compraModal" data-idtarjeta="@tarjeta.id" data-tipotrasaccion="0" data-saldodisponible="@tarjetaDetalle?.saldoDisponible" data-saldototal="@tarjetaDetalle?.saldoTotal">
+                                        <i class="bi bi-credit-card"></i> Realizar Compra
+                                    </button>
+                                    <button type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#compraModal" data-idtarjeta="@tarjeta.id" data-tipotrasaccion="1" data-saldodisponible="@tarjetaDetalle?.saldoDisponible" data-saldototal="@tarjetaDetalle?.saldoTotal">
+                                        <i class="bi bi-credit-card"></i> Realizar Pago
+                                    </button>
+                                    <a class="btn btn-warning" asp-area="" asp-controller="Transacciones" asp-action="Index" asp-route-idTarjeta="@tarjeta.id">
+                                        <i class="bi bi-clock-history"></i> Transacciones
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="compraModal" tabindex="-1" aria-labelledby="compraModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compraModalLabel">Transacción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="compraForm">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="datetime-local" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3" id="descripcionDiv">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" class="form-control" id="monto" name="monto" required>
+                    </div>
+                    <input type="hidden" id="idTarjeta" name="idTarjeta">
+                    <input type="hidden" id="TipoTransaccion" name="TipoTransaccion">
+                    <input type="hidden" id="saldoDisponible" name="saldoDisponible">
+                    <input type="hidden" id="saldoActual" name="saldoActual">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="submitCompraForm">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tarjetasTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/es_es.json'
+                }
+            });
+        });
+
+        var compraModal = document.getElementById('compraModal');
+        compraModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var idTarjeta = button.getAttribute('data-idtarjeta');
+            var tipoTransaccion = button.getAttribute('data-tipotrasaccion');
+            var saldoDisponible = button.getAttribute('data-saldodisponible');
+            var saldoTotal = button.getAttribute('data-saldototal');
+            var modalBodyInputIdTarjeta = compraModal.querySelector('#idTarjeta');
+            var modalBodyInputTipoTransaccion = compraModal.querySelector('#TipoTransaccion');
+            var modalBodyInputSaldoDisponible = compraModal.querySelector('#saldoDisponible');
+            var modalBodyInputSaldoActual = compraModal.querySelector('#saldoActual');
+            var descripcionDiv = document.getElementById('descripcionDiv');
+            var descripcionInput = document.getElementById('descripcion');
+
+            modalBodyInputIdTarjeta.value = idTarjeta;
+            modalBodyInputTipoTransaccion.value = tipoTransaccion;
+            modalBodyInputSaldoDisponible.value = saldoDisponible;
+            modalBodyInputSaldoActual.value = saldoTotal;
+
+            if (tipoTransaccion == "1") {
+                descripcionDiv.style.display = "none";
+                descripcionInput.value = "PagoTC";
+            } else {
+                descripcionDiv.style.display = "block";
+                descripcionInput.value = "";
+            }
+        });
+
+        document.getElementById('submitCompraForm').addEventListener('click', function () {
+            var monto = parseFloat(document.getElementById('monto').value);
+            var saldoDisponible = parseFloat(document.getElementById('saldoDisponible').value);
+            var saldoActual = parseFloat(document.getElementById('saldoActual').value);
+            var tipoTransaccion = document.getElementById('TipoTransaccion').value;
+
+            if (tipoTransaccion == "0" && monto > saldoDisponible) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No tiene suficiente saldo disponible para realizar esta transacción.'
+                });
+                return;
+            }
+
+            if (tipoTransaccion == "1" && monto > saldoActual) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No puede pagar más de lo que debe.'
+                });
+                return;
+            }
+
+            var formData = {
+                FechaTransaccion: document.getElementById('fecha').value,
+                Descripcion: document.getElementById('descripcion').value,
+                Monto: monto,
+                IdTarjeta: document.getElementById('idTarjeta').value,
+                TipoTransaccion: tipoTransaccion
+            };
+
+            console.log(formData);
+
+            fetch('/Tarjeta/Transacciones', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'Transacción realizada con éxito'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al realizar la transacción: ' + data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al realizar la transacción: ' + error.message
+                    });
+                });
+        });
+    </script>
+}

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "gooHGqoKAYDXi1YV4EZzIeyzafXyr6S2zmqYVmdCqrE=",
+  "Source": "PruebaBanco.WebApi",
+  "BasePath": "_content/PruebaBanco.WebApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
